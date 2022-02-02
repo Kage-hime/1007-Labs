@@ -2,6 +2,7 @@
 
 int main()
 {
+
     int i = 0, j = 0, numProcesses = 0, timeSlice = 0, maxBurstTime = 0, temp = 0;
     int burstTime[10],backupBurstTime[10], waitTime[10], turnAroundTime[10], responseTime[10];
 
@@ -42,6 +43,7 @@ int main()
                     temp = temp + burstTime[i];
                     burstTime[i] = 0;
 
+
                 }
 
                 else
@@ -54,29 +56,38 @@ int main()
 
     }
 
-    /*
-        Calculate wait time, turnaround time, response time for each process
 
-     */
-
-
-
-
+ // Calculate wait time, turnaround time, response time for each process
 // code goes here
+    for( i = 0; i < numProcesses; i++)
+    {
+        responseTime[i] = i * timeSlice;
+        waitTime[i] = turnAroundTime[i] - backupBurstTime[i];
+
+
+    }
 
 
 
-printf("\n\t PROCESS\t BURST TIME\t WAITING TIME\t TURNAROUND TIME\t RESPONSE TIME\n");
-for (i = 0 ; i < numProcesses; i++)
-    printf("\t P%d \t\t %d \t\t %d \t\t\t %d \n", i+1, backupBurstTime[i], waitTime[i],turnAroundTime[i],responseTime[i]);
+    printf("\n\t PROCESS\t BURST TIME\t WAITING TIME\t TURNAROUND TIME\t RESPONSE TIME\n");
+    for (i = 0 ; i < numProcesses; i++)
+    {
+           printf("\t P%d \t\t %d \t\t %d \t\t %d \t\t\t %d \n", i+1, backupBurstTime[i], waitTime[i],turnAroundTime[i],responseTime[i]);
+           avgWaitTime += waitTime[i];
+           avgTurnAroundTime += turnAroundTime[i];
+           avgResponseTime += responseTime[i];
+    }
+
+     
 
 
-/* Calc and print avg wait, turnaround and response time*/
-printf("\n\t The Average Waiting time: %.2f\n", avgWaitTime / numProcesses);
-printf("\n\t The Average Turnaround time: %.2f\n", avgTurnAroundTime / numProcesses);
-printf("\n\t The Average Response time: %.2f\n", avgResponseTime / numProcesses);
+
+    /* Calc and print avg wait, turnaround and response time*/
+    printf("\n\t The Average Waiting time: %.2f\n", avgWaitTime / numProcesses);
+    printf("\n\t The Average Turnaround time: %.2f\n", avgTurnAroundTime / numProcesses);
+    printf("\n\t The Average Response time: %.2f\n", avgResponseTime / numProcesses);
 
 
-return 0;
+    return 0;
 }
 
