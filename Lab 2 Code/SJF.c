@@ -4,7 +4,7 @@ int main()
 {
 
     int i = 0, j = 0, numProcesses = 0, timeSlice = 0, leastBurstTime = 0, temp = 0, position;
-    int burstTime[10],backupBurstTime[10], queue[10], waitTime[10], turnAroundTime[10], responseTime[10];
+    float burstTime[10],backupBurstTime[10], queue[10], waitTime[10], turnAroundTime[10], responseTime[10];
 
     float avgWaitTime = 0.0, avgTurnAroundTime = 0.0, avgResponseTime = 0.0;
 
@@ -16,7 +16,7 @@ int main()
     for( i = 0; i < numProcesses; i++)
     {
         printf("\n\t Enter Burst Time for process %d: ", i+1);
-        scanf("%d", &burstTime[i]);
+        scanf("%f", &burstTime[i]);
         backupBurstTime[i] = burstTime[i];
         queue[i] = i + 1;
     }
@@ -65,7 +65,7 @@ int main()
     printf("\n\t PROCESS\t BURST TIME\t WAITING TIME\t TURNAROUND TIME\t RESPONSE TIME\n");
     for (i = 0 ; i < numProcesses; i++)
     {
-           printf("\t P%d \t\t %d \t\t %d \t\t %d \t\t\t %d \n", queue[i], burstTime[i], waitTime[i],turnAroundTime[i],responseTime[i]);
+           printf("\t P%.2f \t\t %.2f \t\t %.2f \t\t %.2f \t\t\t %.2f \n", queue[i], burstTime[i], waitTime[i],turnAroundTime[i],responseTime[i]);
            avgWaitTime += waitTime[i];
            avgTurnAroundTime += turnAroundTime[i];
            avgResponseTime += responseTime[i];
