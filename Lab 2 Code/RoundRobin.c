@@ -67,8 +67,6 @@ int main()
 
     }
 
-
-
     printf("\n\t PROCESS\t BURST TIME\t WAITING TIME\t TURNAROUND TIME\t RESPONSE TIME\n");
     for (i = 0 ; i < numProcesses; i++)
     {
@@ -77,10 +75,6 @@ int main()
            avgTurnAroundTime += turnAroundTime[i];
            avgResponseTime += responseTime[i];
     }
-
-     
-
-
 
     /* Calc and print avg wait, turnaround and response time*/
     printf("\n\t The Average Waiting time: %.2f\n", avgWaitTime / numProcesses);
