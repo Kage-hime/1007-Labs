@@ -11,6 +11,7 @@ int produced;
 //0 means not in use, 1 means critical process inside
 int value;
 sem_t* semaphorePointer;
+pthread_mutex_t test_mutex;
 //1 indicates full, 0 indicates not full
 int full = 0;
 //1 indicates empty, 0 indicates not empty
@@ -26,11 +27,12 @@ void *producer(int number)
 
     do
     {
-        sleep(rand()%4);
+        
         produced = (rand() % 999);
         //insert mutex check here
         //if(sem_getvalue(semaphorePointer, &value) != 0  )
-        if(lock == 0  )
+        //if(lock == 0  )
+        pthread_mutex_lock(&test_mutex);
         {
             //sem_wait(semaphorePointer);
             lock = 1;
@@ -40,6 +42,11 @@ void *producer(int number)
                 {
                     bufferList[i] = produced;
                     printf("Producer made %d\n", bufferList[i]);
+
+                    for(int i = 0 ; i < 5 ; i++)
+    {
+       printf("%d\n" , bufferList[i]);
+    }
                     full = 0;
                     empty = 0;
                     break;
@@ -58,10 +65,11 @@ void *producer(int number)
             }
 
             //sem_post(semaphorePointer);  
-            lock = 0;              
+            //lock = 0;    
+            pthread_mutex_unlock(&test_mutex);          
         }
        
-       
+       sleep(rand()%4);
         
 
     } while (1);
@@ -78,17 +86,19 @@ void *consumer(int number)
 
     do
     {
-        sleep(rand()%4);
+        
 
         //insert mutex check here
         //if(sem_getvalue(semaphorePointer, &value) != 0  )
-        if(lock == 0  )
+        //if(lock == 0  )
+        pthread_mutex_lock(&test_mutex);
         {
             //sem_wait(semaphorePointer);
             lock = 1;
             if(empty != 1)
             {
                 printf("Consumer took %d\n", bufferList[0]);
+
                 
                 for(int i = 1 ; i < 5 ; i++)
                 {
@@ -101,17 +111,23 @@ void *consumer(int number)
                 {
                     empty = 1;
                 }
+                
+                for(int i = 0 ; i < 5 ; i++)
+    {
+       printf("%d\n" , bufferList[i]);
+    }
 
             }
  
             //sem_post(semaphorePointer);
-            lock = 0;
+            //lock = 0;
+            pthread_mutex_unlock(&test_mutex);
                 
         }
         
         
         
-        
+        sleep(rand()%4);
         
 
     } while (1);
@@ -123,9 +139,10 @@ void *consumer(int number)
 int main(int argc, char *argv[])
 {   
     //unnamed semaphore creation
-    
     //pointer, accesstype, default value
-    sem_init(semaphorePointer, 1, 10); 
+    //sem_init(semaphorePointer, 1, 10); 
+
+    pthread_mutex_init(&test_mutex, NULL);
 
     //get parameters from user
     waitTime = atoi(argv[1]);
@@ -144,7 +161,7 @@ int main(int argc, char *argv[])
     for(int i = 0 ; i < producerCount; i ++)
     {
        
-        threadID = pthread_create(&threads[i],NULL,producer,i+1);
+        threadID = pthread_create(&threads[i],NULL,producer,(int) i+1);
         
         //pthread_join(threads[i],NULL);
         
@@ -155,14 +172,40 @@ int main(int argc, char *argv[])
     for(int i = 0 ; i < consumerCount; i ++)
     {
         
-        threadID = pthread_create(&threads[i+producerCount],NULL,consumer,i+producerCount);
+        threadID = pthread_create(&threads[i+producerCount],NULL,consumer,(int) i+1);
         
         //pthread_join(threads[i+producerCount],NULL);
     }
 
 
    
-    getch();
+    sleep(waitTime);
+
+    for(int i = 0 ; i < producerCount + consumerCount; i ++)
+    {
+        
+        pthread_cancel(threads[i]);
+        
+        //pthread_join(threads[i+producerCount],NULL);
+    }
+
+    printf("Sleep time elapsed. Producers and Consumers terminated\n");
+
+    int itemCount = 0 ;
+    for(int i = 0 ; i < 5 ; i++)
+    {
+        if(bufferList[i] != 0)
+            itemCount +=1;
+    }
+
+    printf("Number of remaining items on buffer = %d\n" , itemCount);
+
+    for(int i = 0 ; i < 5 ; i++)
+    {
+       printf("%d\n" , bufferList[i]);
+    }
+
+    pthread_mutex_destroy(&test_mutex);
     
     return 0;
 }
