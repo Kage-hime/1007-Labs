@@ -16,6 +16,8 @@ int full = 0;
 //1 indicates empty, 0 indicates not empty
 int empty = 1;
 
+int lock = 0;
+
 
 
 void *producer(int number)
@@ -24,12 +26,14 @@ void *producer(int number)
 
     do
     {
-        sleep(rand()%3);
+        sleep(rand()%4);
         produced = (rand() % 999);
         //insert mutex check here
-        if(sem_getvalue(semaphorePointer, &value) != 0  )
+        //if(sem_getvalue(semaphorePointer, &value) != 0  )
+        if(lock == 0  )
         {
-            sem_wait(semaphorePointer);
+            //sem_wait(semaphorePointer);
+            lock = 1;
             for(int i = 0 ; i < 5 ; i++)
             {
                 if(bufferList[i] == 0)
@@ -50,10 +54,11 @@ void *producer(int number)
 
             if(full)
             {
-                printf("LOL FULL\n");         
+                //printf("LOL FULL\n");         
             }
 
-            sem_post(semaphorePointer);                
+            //sem_post(semaphorePointer);  
+            lock = 0;              
         }
        
        
@@ -73,13 +78,14 @@ void *consumer(int number)
 
     do
     {
-        sleep(rand()%3);
+        sleep(rand()%4);
 
         //insert mutex check here
-        if(sem_getvalue(semaphorePointer, &value) != 0  )
+        //if(sem_getvalue(semaphorePointer, &value) != 0  )
+        if(lock == 0  )
         {
-            sem_wait(semaphorePointer);
-    
+            //sem_wait(semaphorePointer);
+            lock = 1;
             if(empty != 1)
             {
                 printf("Consumer took %d\n", bufferList[0]);
@@ -98,10 +104,11 @@ void *consumer(int number)
 
             }
  
-            sem_post(semaphorePointer);
+            //sem_post(semaphorePointer);
+            lock = 0;
                 
         }
-
+        
         
         
         
@@ -138,6 +145,7 @@ int main(int argc, char *argv[])
     {
        
         threadID = pthread_create(&threads[i],NULL,producer,i+1);
+        
         //pthread_join(threads[i],NULL);
         
 
@@ -148,6 +156,7 @@ int main(int argc, char *argv[])
     {
         
         threadID = pthread_create(&threads[i+producerCount],NULL,consumer,i+producerCount);
+        
         //pthread_join(threads[i+producerCount],NULL);
     }
 
