@@ -124,7 +124,7 @@ void main()
     fwrite(&f, 1, sizeof(f), fpBin); 
  
     // add binary data: 0x00 to 0xFF 
-    for (i = 0x00; i <= 0xFF; i++) 
+    for (i = 0x00; i <=0xFF; i++) 
     { 
         ch = i;  
         ret = fputc(ch, fpBin); 
@@ -133,7 +133,7 @@ void main()
     fclose(fpBin); 
  
     printf("\nOpening bin mode data file, %s\n", "Lab5_BinData.bin"); 
-    fpBinData = fopen("Lab5_BinData.bin", "r"); // binary mode 
+    fpBinData = fopen("Lab5_BinData.bin", "rb"); // binary mode 
     if(fpBinData == NULL) { 
         printf("Error in creating file, %s\n", "Lab5_BinData.bin"); 
         fclose(fpBinData); 
