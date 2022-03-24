@@ -7,6 +7,8 @@ void main()
     int i = 0, j = 0 , k = 0;
     int minArrivalIndex = 0, min_count = 0, next = 0;
     int framePageRepeatCount[25], arrivalIndex[25];
+    int min_index = 0;
+    int sameminflag = 1;
 
     printf("\n Page Replacement Method: Least Frequently Used (LFU) with FIFO");
     printf("\n Enter the number of pages in the page sequence: ");
@@ -41,12 +43,8 @@ void main()
         int pageEntered = 0, counter = 0;
         min_count = 25;
         
-        for(i = 0 ; i < k+1 ; i++)
-                if(pageNumbers[i] == pageNumbers[k])  
-                    counter++;
-            for(i = 0 ; i < k+1 ; i++)
-                if(pageNumbers[i] == pageNumbers[k])
-                    framePageRepeatCount[i] = counter;
+        
+            
 
         //check for empty frame
         for (j = 0; j < numFrames; j++)
@@ -63,17 +61,22 @@ void main()
                     printf("\t %d", frameContents[i]);
                 printf("\t %d \n", totalPageFaults);
 
+                framePageRepeatCount[j] ++;
+
                 break;
             }
             //if no empty frame, check if any of the frame matches the current frame
             if (frameContents[j] == pageNumbers[k])
             {
                 pageEntered = 1;
-                arrivalIndex[j] = k;
+                //arrivalIndex[j] = k;
                 printf("\t %d", pageNumbers[k]);
                 for (i = 0; i < numFrames; i++)
                     printf("\t %d", frameContents[i]);
                 printf("\n ");
+
+                framePageRepeatCount[j] ++;
+                
                 break;
             }
         }
@@ -81,41 +84,27 @@ void main()
         
         if(pageEntered)
         {
-            // for(i = 0 ; i < k+1 ; i++)
-            //     if(pageNumbers[i] == pageNumbers[k])  
-            //         counter++;
-            // for(i = 0 ; i < k+1 ; i++)
-            //     if(pageNumbers[i] == pageNumbers[k])
-            //         framePageRepeatCount[i] = counter;
             continue;
         }
         //if no empty frame and no matches, apply LFU + FIFO here
 
-        int min_index = 0;
-        int sameminflag = 1;
+        //smallest
 
         for(i = 0; i < numFrames; i++)
         {
-            for(j = 0; j < numPages; j++)
-                {
-                    if(frameContents[i] == pageNumbers[j])
-                    {
-                        if(framePageRepeatCount[j] == min_count)
-                        {
-                            sameminflag = 1;
-                            break;
-                        }
+            //sameminflag minindex
+            if(framePageRepeatCount[i] < min_count)
+            {
+                sameminflag = 0;
+                min_index = i;
+                min_count = framePageRepeatCount[i];
+            }
 
-                        if(framePageRepeatCount[j] < min_count)
-                        {   
-                            min_index = i;
-                            sameminflag = 0;
-                            min_count = framePageRepeatCount[j];
-                            break;
-                        }
-
-                    }
-                }
+            if(framePageRepeatCount[i] == min_count)
+            {
+                sameminflag = 1;
+            }
+                
         }
 
 
@@ -131,22 +120,23 @@ void main()
             {
                 if(arrivalIndex[i] < smallestk)
                 {
-                    smallestk = arrivalIndex[i];
-                    smallestindex  = i;
+                    //check if frame content's use count is equal to min_count
+                        if(framePageRepeatCount[i] == min_count)
+                        {
+                            smallestk = arrivalIndex[i];
+                            smallestindex  = i;
+                        }   
+                 
                 }
-                           
+                
+                //0 is used because since 3 and 2 have same use count, it enters here
+                //then 0 gets removed because it was the oldest despite having higher use count
             }
 
+            framePageRepeatCount[smallestindex] = 0;
             frameContents[smallestindex] = pageNumbers[k];
             arrivalIndex[smallestindex] = k;
             totalPageFaults++;
-
-            // for(i = 0 ; i < k+1 ; i++)
-            //     if(pageNumbers[i] == pageNumbers[k])  
-            //         counter++;
-            // for(i = 0 ; i < k+1 ; i++)
-            //     if(pageNumbers[i] == pageNumbers[k])
-            //         framePageRepeatCount[i] = counter;
             printf("\t %d", pageNumbers[k]);
                 for (j = 0; j < numFrames; j++)
                     printf("\t %d", frameContents[j]);
@@ -156,14 +146,10 @@ void main()
         //non FIFO
         else
         {
+        
+        framePageRepeatCount[min_index] = 0;
         frameContents[min_index] = pageNumbers[k];
         totalPageFaults++;
-        // for(i = 0 ; i < k+1; i++)
-        //     if(pageNumbers[i] == pageNumbers[k])  
-        //         counter++;
-        // for(i = 0 ; i < k+1; i++)
-        //     if(pageNumbers[i] == pageNumbers[k])
-        //         framePageRepeatCount[i] = counter;
         arrivalIndex[min_index] = k;
         printf("\t %d", pageNumbers[k]);
                 for (j = 0; j < numFrames; j++)
@@ -171,6 +157,7 @@ void main()
                 printf("\t %d \n", totalPageFaults);
         }
         
+       
     }
 
     /* Find the occurence of page faults and the total number of page faults */
